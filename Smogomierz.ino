@@ -18,7 +18,7 @@
 #include "src/SHT1x.h" // https://github.com/practicalarduino/SHT1x // 2.01.2019
 #include <DHT.h>
 
-#include "src/pms.h" // https://github.com/fu-hsi/PMS // 2.01.2019
+#include "src/hpma115S0.h" // https://github.com/hpsaturn/HPMA115S0 // 2.01.2019
 
 #include "src/spiffs.h"
 #include "src/config.h"
@@ -34,7 +34,7 @@
   SHT1x: VIN - 3V; GND - G; SCL - D5; DATA/SDA - D6 wymaga rezystora 10k podłaczonego do VCC
   SHT21/HTU21D: VIN - 3V; GND - G; SCL - D5; SDA - D6
   DHT22: VIN - 3V; GND - G; D7
-  PMS5003/7003: Bialy - VIN/5V; Czarny - G; Zielony/TX - D1; Niebieski/RX - D2
+  HPMA115S0: Bialy - VIN/5V; Czarny - G; Zielony/TX - D1; Niebieski/RX - D2
 
 
   Connection of sensors on ESP8266 NodeMCU:
@@ -42,7 +42,7 @@
   SHT1x: VIN - 3V; GND - G; SCL - D5; DATA/SDA - D6 required pull-up resistor 10k to VCC
   SHT21/HTU21D: VIN - 3V; GND - G; SCL - D5; SDA - D6
   DHT22: VIN - 3V; GND - G; D7
-  PMS5003/7003: White - VIN/5V; Black - G; Green/TX - D1; Blue/RX - D2
+  HPMA115S0: White - VIN/5V; Black - G; Green/TX - D1; Blue/RX - D2
 */
 
 // BME280 config
@@ -66,10 +66,9 @@ DHT dht(DHTPIN, DHTTYPE);
 #define clockPin 12 //D6
 SHT1x sht1x(dataPin, clockPin);
 
-// Serial for PMS7003 config
-SoftwareSerial mySerial(5, 4); // Change TX - D1 and RX - D2 pins
-PMS pms(mySerial);
-PMS::DATA data;
+// HPMA115S0 config
+SoftwareSerial hpmaSerial(5, 4); // TX/RX – D1/D2
+HPMA115S0 hpma115S0(hpmaSerial);
 
 char device_name[20];
 
@@ -92,6 +91,7 @@ unsigned long previous_REBOOT_Millis = 0;
 int pmMeasurements[10][3];
 int iPM, averagePM1, averagePM25, averagePM10 = 0;
 float calib = 1;
+unsigned int hpma115S0_pm25, hpma115S0_pm10;
 
 ESP8266WebServer WebServer(80);
 ESP8266HTTPUpdateServer httpUpdater;
@@ -224,16 +224,19 @@ void setup() {
   fs_setup();
   delay(10);
 
-  if (!strcmp(DUST_MODEL, "PMS7003")) {
-    mySerial.begin(9600); //PMS7003 serial
+  if (!strcmp(DUST_MODEL, "HPMA115S0")) {
+    hpmaSerial.begin(9600); //HPMA115S0 serial
+    delay(100);
     if (FREQUENTMEASUREMENT == true) {
-      pms.wakeUp();
-      delay(500);
-      pms.activeMode();
+      hpma115S0.Init();
+      delay(100);
+      hpma115S0.EnableAutoSend();
+      delay(100);
+      hpma115S0.StartParticleMeasurement();
     } else {
-      pms.passiveMode();
-      delay(500);
-      pms.sleep();
+      hpma115S0.Init();
+      delay(100);
+      hpma115S0.StopParticleMeasurement();
     }
   }
   delay(10);
@@ -332,7 +335,6 @@ void setup() {
 void loop() {
   BMESensor.refresh();
   pm_calibration();
-  pms.read(data);
   delay(10);
 
   //webserverShowSite(WebServer, BMESensor, data);
@@ -381,12 +383,12 @@ void loop() {
         Serial.println("Opening database failed");
       } else {
         dbMeasurement row(device_name);
-        if (!strcmp(DUST_MODEL, "PMS7003")) {
+        if (!strcmp(DUST_MODEL, "HPMA115S0")) {
           if (DEBUG) {
             if (SELECTED_LANGUAGE == 1) {
-              Serial.println("Measurements from PMS7003!\n");
+              Serial.println("Measurements from HPMA115S0!\n");
             } else if (SELECTED_LANGUAGE == 2) {
-              Serial.println("Dane z PMS7003!\n");
+              Serial.println("Dane z HPMA115S0!\n");
             }
           }
           row.addField("pm1", averagePM1);
@@ -395,9 +397,9 @@ void loop() {
         } else {
           if (DEBUG) {
             if (SELECTED_LANGUAGE == 1) {
-              Serial.println("No measurements from PMS7003!\n");
+              Serial.println("No measurements from HPMA115S0!\n");
             } else if (SELECTED_LANGUAGE == 2) {
-              Serial.println("Brak danych z PMS7003!\n");
+              Serial.println("Brak danych z HPMA115S0!\n");
             }
           }
           row.addField("pm1", averagePM1);
@@ -542,9 +544,11 @@ void loop() {
     unsigned long current_DUST_Millis = millis();
     if (FREQUENTMEASUREMENT == true ) {
       if (current_DUST_Millis - previous_DUST_Millis >= DUST_interval) {
-        pmMeasurements[iPM][0] = int(calib * data.PM_AE_UG_1_0);
-        pmMeasurements[iPM][1] = int(calib * data.PM_AE_UG_2_5);
-        pmMeasurements[iPM][2] = int(calib * data.PM_AE_UG_10_0);
+        if (hpma115S0.ReadParticleMeasurement(&hpma115S0_pm25, &hpma115S0_pm10)) {
+          pmMeasurements[iPM][0] = int(calib * 0);
+          pmMeasurements[iPM][1] = int(calib * hpma115S0_pm25);
+          pmMeasurements[iPM][2] = int(calib * hpma115S0_pm10);
+        }
         if (DEBUG) {
           Serial.print("\n\nNumer pomiaru PM: ");
           Serial.print(iPM);
@@ -585,22 +589,26 @@ void loop() {
         if (DEBUG) {
           Serial.print("\nTurning ON PM sensor...");
         }
-        if (!strcmp(DUST_MODEL, "PMS7003")) {
-          pms.wakeUp();
+        if (!strcmp(DUST_MODEL, "HPMA115S0")) {
+          hpma115S0.Init();
+          delay(10);
+          hpma115S0.EnableAutoSend();
+          delay(10);
+          hpma115S0.StartParticleMeasurement();
           delay(6000); // waiting 6 sec...
         }
         int counterNM1 = 0;
         while (counterNM1 < NUMBEROFMEASUREMENTS) {
           unsigned long current_2sec_Millis = millis();
           if (current_2sec_Millis - previous_2sec_Millis >= TwoSec_interval) {
-            if (!strcmp(DUST_MODEL, "PMS7003")) {
-              pms.requestRead();
+            if (!strcmp(DUST_MODEL, "HPMA115S0")) {
+
             }
             delay(1000);
-            if (pms.readUntil(data)) {
-              pmMeasurements[iPM][0] = int(calib * data.PM_AE_UG_1_0);
-              pmMeasurements[iPM][1] = int(calib * data.PM_AE_UG_2_5);
-              pmMeasurements[iPM][2] = int(calib * data.PM_AE_UG_10_0);
+            if (hpma115S0.ReadParticleMeasurement(&hpma115S0_pm25, &hpma115S0_pm10)) {
+              pmMeasurements[iPM][0] = int(calib * 0);
+              pmMeasurements[iPM][1] = int(calib * hpma115S0_pm25);
+              pmMeasurements[iPM][2] = int(calib * hpma115S0_pm10);
             }
             if (DEBUG) {
               Serial.print("\n\nNumer pomiaru PM: ");
@@ -645,8 +653,10 @@ void loop() {
         if (DEBUG) {
           Serial.print("\nTurning OFF PM sensor...");
         }
-        if (!strcmp(DUST_MODEL, "PMS7003")) {
-          pms.sleep();
+        if (!strcmp(DUST_MODEL, "HPMA115S0")) {
+          hpma115S0.DisableAutoSend();
+          delay(10);
+          hpma115S0.StopParticleMeasurement();
         }
         previous_DUST_Millis = millis();
       }
