@@ -358,10 +358,10 @@ String _addDUST_MODELSelect(const String &key, const String &value) {
   input += key;
   input += "'>";
   if (SELECTED_LANGUAGE == 1) {
-    input += _addOption("PMS7003", "PMS5003/7003", value);
+    input += _addOption("SDS011/21", "SDS011/21", value);
     input += _addOption("Non", "Without sensor", value);
   } else if (SELECTED_LANGUAGE == 2) {
-    input += _addOption("PMS7003", "PMS5003/7003", value);
+    input += _addOption("SDS011/21", "SDS011/21", value);
     input += _addOption("Non", "Bez miernika", value);
   }
   input += "</select><br />";

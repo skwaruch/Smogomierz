@@ -18,7 +18,7 @@
 #include "src/SHT1x.h" // https://github.com/practicalarduino/SHT1x // 2.01.2019
 #include <DHT.h>
 
-#include "src/pms.h" // https://github.com/fu-hsi/PMS // 2.01.2019
+#include "src/SdsDustSensor.h" // SDS011/SDS021 - https://github.com/lewapek/sds-dust-sensors-arduino-library // 2.01.2019
 
 #include "src/spiffs.h"
 #include "src/config.h"
@@ -34,7 +34,7 @@
   SHT1x: VIN - 3V; GND - G; SCL - D5; DATA/SDA - D6 wymaga rezystora 10k podłaczonego do VCC
   SHT21/HTU21D: VIN - 3V; GND - G; SCL - D5; SDA - D6
   DHT22: VIN - 3V; GND - G; D7
-  PMS5003/7003: Bialy - VIN/5V; Czarny - G; Zielony/TX - D1; Niebieski/RX - D2
+  SDS011/21: VIN - 5V; GND - G; TX - D7; RX - D8
 
 
   Connection of sensors on ESP8266 NodeMCU:
@@ -42,7 +42,7 @@
   SHT1x: VIN - 3V; GND - G; SCL - D5; DATA/SDA - D6 required pull-up resistor 10k to VCC
   SHT21/HTU21D: VIN - 3V; GND - G; SCL - D5; SDA - D6
   DHT22: VIN - 3V; GND - G; D7
-  PMS5003/7003: White - VIN/5V; Black - G; Green/TX - D1; Blue/RX - D2
+  SDS011/21: VIN - 5V; GND - G; TX - D7; RX - D8
 */
 
 // BME280 config
@@ -66,10 +66,8 @@ DHT dht(DHTPIN, DHTTYPE);
 #define clockPin 12 //D6
 SHT1x sht1x(dataPin, clockPin);
 
-// Serial for PMS7003 config
-SoftwareSerial mySerial(5, 4); // Change TX - D1 and RX - D2 pins
-PMS pms(mySerial);
-PMS::DATA data;
+// SDS011/21 config
+SdsDustSensor sds(5, 4);
 
 char device_name[20];
 
@@ -92,6 +90,7 @@ unsigned long previous_REBOOT_Millis = 0;
 int pmMeasurements[10][3];
 int iPM, averagePM1, averagePM25, averagePM10 = 0;
 float calib = 1;
+float SDSpm25, SDSpm10;
 
 ESP8266WebServer WebServer(80);
 ESP8266HTTPUpdateServer httpUpdater;
@@ -224,16 +223,15 @@ void setup() {
   fs_setup();
   delay(10);
 
-  if (!strcmp(DUST_MODEL, "PMS7003")) {
-    mySerial.begin(9600); //PMS7003 serial
+  if (!strcmp(DUST_MODEL, "SDS011/21")) {
+    sds.begin();  //SDS011/21 sensor begin
     if (FREQUENTMEASUREMENT == true) {
-      pms.wakeUp();
-      delay(500);
-      pms.activeMode();
+      sds.wakeup();
+      sds.setQueryReportingMode().toString(); // ensures sensor is in 'query' reporting mode
+      sds.setContinuousWorkingPeriod().toString(); // ensures sensor has continuous working period - default but not recommended
     } else {
-      pms.passiveMode();
-      delay(500);
-      pms.sleep();
+      sds.setCustomWorkingPeriod(1);
+      WorkingStateResult state = sds.sleep();
     }
   }
   delay(10);
@@ -332,7 +330,7 @@ void setup() {
 void loop() {
   BMESensor.refresh();
   pm_calibration();
-  pms.read(data);
+  PmResult SDSdata = sds.queryPm();
   delay(10);
 
   //webserverShowSite(WebServer, BMESensor, data);
@@ -381,12 +379,12 @@ void loop() {
         Serial.println("Opening database failed");
       } else {
         dbMeasurement row(device_name);
-        if (!strcmp(DUST_MODEL, "PMS7003")) {
+        if (!strcmp(DUST_MODEL, "SDS011/21")) {
           if (DEBUG) {
             if (SELECTED_LANGUAGE == 1) {
-              Serial.println("Measurements from PMS7003!\n");
+              Serial.println("Measurements from SDS011/21!\n");
             } else if (SELECTED_LANGUAGE == 2) {
-              Serial.println("Dane z PMS7003!\n");
+              Serial.println("Dane z SDS011/21!\n");
             }
           }
           row.addField("pm1", averagePM1);
@@ -395,9 +393,9 @@ void loop() {
         } else {
           if (DEBUG) {
             if (SELECTED_LANGUAGE == 1) {
-              Serial.println("No measurements from PMS7003!\n");
+              Serial.println("No measurements from SDS011/21!\n");
             } else if (SELECTED_LANGUAGE == 2) {
-              Serial.println("Brak danych z PMS7003!\n");
+              Serial.println("Brak danych z SDS011/21!\n");
             }
           }
           row.addField("pm1", averagePM1);
@@ -542,9 +540,15 @@ void loop() {
     unsigned long current_DUST_Millis = millis();
     if (FREQUENTMEASUREMENT == true ) {
       if (current_DUST_Millis - previous_DUST_Millis >= DUST_interval) {
-        pmMeasurements[iPM][0] = int(calib * data.PM_AE_UG_1_0);
-        pmMeasurements[iPM][1] = int(calib * data.PM_AE_UG_2_5);
-        pmMeasurements[iPM][2] = int(calib * data.PM_AE_UG_10_0);
+
+        if (SDSdata.isOk()) {
+          pmMeasurements[iPM][0] = int(calib * 0);
+          pmMeasurements[iPM][1] = int(calib * SDSdata.pm25);
+          pmMeasurements[iPM][2] = int(calib * SDSdata.pm10);
+        } else {
+          Serial.println("Could not read values from SDS sensor :( ");
+        }
+
         if (DEBUG) {
           Serial.print("\n\nNumer pomiaru PM: ");
           Serial.print(iPM);
@@ -585,22 +589,26 @@ void loop() {
         if (DEBUG) {
           Serial.print("\nTurning ON PM sensor...");
         }
-        if (!strcmp(DUST_MODEL, "PMS7003")) {
-          pms.wakeUp();
+        if (!strcmp(DUST_MODEL, "SDS011/21")) {
+          sds.wakeup();
+          sds.setQueryReportingMode().toString(); // ensures sensor is in 'query' reporting mode
+          sds.setContinuousWorkingPeriod().toString(); // ensures sensor has continuous working period - default but not recommended
           delay(6000); // waiting 6 sec...
         }
         int counterNM1 = 0;
         while (counterNM1 < NUMBEROFMEASUREMENTS) {
           unsigned long current_2sec_Millis = millis();
           if (current_2sec_Millis - previous_2sec_Millis >= TwoSec_interval) {
-            if (!strcmp(DUST_MODEL, "PMS7003")) {
-              pms.requestRead();
+            if (!strcmp(DUST_MODEL, "SDS011/21")) {
+              PmResult SDSdata = sds.queryPm();
             }
             delay(1000);
-            if (pms.readUntil(data)) {
-              pmMeasurements[iPM][0] = int(calib * data.PM_AE_UG_1_0);
-              pmMeasurements[iPM][1] = int(calib * data.PM_AE_UG_2_5);
-              pmMeasurements[iPM][2] = int(calib * data.PM_AE_UG_10_0);
+            if (SDSdata.isOk()) {
+              pmMeasurements[iPM][0] = int(calib * 0);
+              pmMeasurements[iPM][1] = int(calib * SDSdata.pm25);
+              pmMeasurements[iPM][2] = int(calib * SDSdata.pm10);
+            } else {
+              Serial.println("Could not read values from SDS sensor :( ");
             }
             if (DEBUG) {
               Serial.print("\n\nNumer pomiaru PM: ");
@@ -645,8 +653,9 @@ void loop() {
         if (DEBUG) {
           Serial.print("\nTurning OFF PM sensor...");
         }
-        if (!strcmp(DUST_MODEL, "PMS7003")) {
-          pms.sleep();
+        if (!strcmp(DUST_MODEL, "SDS011/21")) {
+          sds.setCustomWorkingPeriod(1);
+          WorkingStateResult state = sds.sleep();
         }
         previous_DUST_Millis = millis();
       }
