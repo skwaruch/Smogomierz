@@ -1,4 +1,4 @@
-# Smogomierz
+# Smogomierz [![Build Status](https://travis-ci.org/hackerspace-silesia/Smogomierz.svg?branch=master)](https://travis-ci.org/hackerspace-silesia/Smogomierz)
 
 ![Smogomierz1](https://raw.githubusercontent.com/hackerspace-silesia/Smogomierz/master/instrukcje/photos/Smogomierz1.jpg)
 
@@ -8,7 +8,13 @@ Smogomierz nie wysyła Twoich danych do żadnego serwisu, jeśli nie wyrazisz na
 
 Smogomierz po pierwszym uruchomieniu tworzy własną sieć WiFi o nazwie "Smogomierz-deviceName"(np. "Smogomierz-328017"). Po podłączeniu się z nią, będziesz miał możliwość skonfigurowania połączenia WiFi z własną siecią domową. Z listy dostępnych sieci wybierz swoją własną i podaj do niej hasło. Smogomierz zapisze dane w swojej pamięci wewnętrznej i ponownie się uruchomienie. Dalszą konfigurację wykonasz już przez przeglądarkę internetową wchodząc pod adres Smogomierz-deviceName.local lub IP_Smogomierza(do sprawdzenia na routerze). 
 
-Wkrótce planujemy udostępnić aplikację na Windowsa/macOS/Linuksa, która umożliwi w łatwy sposób wgranie oprogramowania oraz znalezienie adresu IP Twojego miernika!
+Stworzyliśmy również aplikację dla systemów Windows, macOS oraz Linux), która umożliwia w łatwy sposób wgranie oprogramowania oraz znajdowanie adresu IP Twojego miernika! Możesz ją pobrać ze strony [github.com/hackerspace-silesia/Smogomierz-Flashing-Tool](https://github.com/hackerspace-silesia/Smogomierz-Flashing-Tool/releases).
+
+## Darowizny
+
+Projekt Smogomierza jest rozwijany od ponad roku. Wszystko w ramach projektu Smogomierz robione jest za darmo, w ramach wolontariatu. Jeśli chcesz wesprzeć rozwój projektu, to możesz przekazać darowiznę na Stowarzyszenie Hackerspace Silesia. Najprościej można to zrobić przez specjalny formularz znajdujący się na stronie: [hs-silesia.pl/smogomierz](https://hs-silesia.pl/smogomierz/).
+
+<a href="https://hs-silesia.pl/smogomierz/"><img align="left" width="1204" height="336" src="https://smogomierz.hs-silesia.pl/WsparcieSmogomierzeHS.jpg"></a>
 
 ## Instrukcje
 
@@ -41,6 +47,6 @@ ArdinoIDE 1.8.5 – https://www.arduino.cc/en/main/software
 - [ ] Nowy design
 - [ ] Kropki a nie przecinki przy zmianie współrzędnych w /config
 - [ ] Automatyczne aktualizacje oprogramowania mierników
-- [ ] Przygotowanie aplikacji Smogomierz-firmware-flasher bazującej na [airrohr-firmware-flasher](https://github.com/hackerspace-silesia/airrohr-firmware-flasher)
+- [X] Przygotowanie aplikacji [Smogomierz-Flashing-Tool](https://github.com/hackerspace-silesia/Smogomierz-Flashing-Tool/)
 
 
