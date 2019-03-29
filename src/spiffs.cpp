@@ -254,6 +254,7 @@ bool saveConfig() {
 
   json["SENDING_FREQUENCY"] = SENDING_FREQUENCY;
   json["SENDING_DB_FREQUENCY"] = SENDING_DB_FREQUENCY;
+  
   json["DEEPSLEEP_ON"] = DEEPSLEEP_ON;
 
   json["DEBUG"] = DEBUG;
