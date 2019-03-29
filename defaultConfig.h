@@ -14,6 +14,7 @@ int DUST_TIME = 1;
 int NUMBEROFMEASUREMENTS = 10;
 
 bool LUFTDATEN_ON = false;
+bool SMOGLIST_ON = true;
 
 bool AIRMONITOR_ON = false;
 bool AIRMONITOR_GRAPH_ON = true;
@@ -40,6 +41,7 @@ char MQTT_USER[255] = "username";
 char MQTT_PASSWORD[255] = "password";
 
 int SENDING_FREQUENCY = 2;
+int SENDING_DB_FREQUENCY = 2;
 bool DEEPSLEEP_ON = false;
 
 bool DEBUG = false;

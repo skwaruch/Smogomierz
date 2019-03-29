@@ -36,7 +36,7 @@ const char WEB_ROOT_PAGE_AIRMONITOR_GRAPH[] PROGMEM = "<hr>\
     <iframe src='http://metrics.airmonitor.pl:3000/dashboard-solo/db/airmonitor?orgId=1&var-latitude={LATITUDE}&var-longitude={LONGITUDE}&refresh=1m&panelId=13' frameborder='0' style='overflow: hidden; height: 100%; width: 100%; max-height: 510; max-width: 450;' ></iframe> ";
 
 const char WEB_ROOT_PAGE_THINGSPEAK_GRAPH[] PROGMEM = "<hr>\
-	<iframe src='<iframe width='450' height='260' style='border: 1px solid #cccccc;' src='https://thingspeak.com/channels/{THINGSPEAK_CHANNEL_ID}/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=PM2.5&type=line&yaxis=ug%2Fm3&update=15'></iframe>\
+	<iframe width='450' height='260' style='border: 1px solid #cccccc;' src='https://thingspeak.com/channels/{THINGSPEAK_CHANNEL_ID}/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=PM2.5&type=line&yaxis=ug%2Fm3&update=15'></iframe>\
     <iframe width='450' height='260' style='border: 1px solid #cccccc;' src='https://thingspeak.com/channels/{THINGSPEAK_CHANNEL_ID}/charts/3?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=PM10&type=line&yaxis=ug%2Fm3&update=15'></iframe>\
 	<iframe width='450' height='260' style='border: 1px solid #cccccc;' src='https://thingspeak.com/channels/{THINGSPEAK_CHANNEL_ID}/charts/4?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Temperatura&type=line&update=15'></iframe>\
 	<iframe width='450' height='260' style='border: 1px solid #cccccc;' src='https://thingspeak.com/channels/{THINGSPEAK_CHANNEL_ID}/charts/5?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Ci%C5%9Bnienie&type=line&update=15'></iframe>\
@@ -62,7 +62,9 @@ const char WEB_CONFIG_PAGE_CONFIG[] PROGMEM = "<b>{TEXT_DEVICENAME}: </b>{device
 	<b>{TEXT_MEASUREMENTFREQUENCY}: </b>{FREQUENTMEASUREMENT_time}\
 	<b>{TEXT_AVERAGELASTRESULT}: </b>{NUMBEROFMEASUREMENTS}\
 	<b>{TEXT_SENDINGINTERVAL}: </b>{SENDING_FREQUENCY}\
-	<hr><b>DeepSleep: </b>{DEEPSLEEP_ON} {TEXT_DEEPSLEEPINFO}<hr>\
+	<b>{TEXT_DBSENDINGINTERVAL}: </b>{SENDING_DB_FREQUENCY}\
+	<hr><b>DeepSleep: </b>{DEEPSLEEP_ON} {TEXT_DEEPSLEEPINFO}\
+	<hr>\
 	<b>{TEXT_DISPLAYPM1}: </b> {DISPLAY_PM1}\
 	<b>{TEXT_ALTITUDEINFO}: </b>{MYALTITUDE}\
 	<hr>\
@@ -70,7 +72,9 @@ const char WEB_CONFIG_PAGE_CONFIG[] PROGMEM = "<b>{TEXT_DEVICENAME}: </b>{device
 	<b>{TEXT_SECURELOGIN}: </b>{CONFIG_USERNAME}\
 	<b>{TEXT_SECUREPASSWD}: </b>{CONFIG_PASSWORD}\
 	{TEXT_SECURELOGOUTINFO}\
-	<hr>\
+	<!-- <hr>\
+	<b>{TEXT_SMOGLISTSENDING}: </b>{SMOGLIST_ON} --> \
+	<hr>\	
 	<b>{TEXT_LUFTDATENSENDING}: </b>{LUFTDATEN_ON}\
 	<b>ChipID: </b>{ChipID}\
 	<hr>\
