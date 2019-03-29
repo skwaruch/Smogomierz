@@ -60,6 +60,7 @@ bool loadConfig() {
   NUMBEROFMEASUREMENTS = json["NUMBEROFMEASUREMENTS"];
 
   LUFTDATEN_ON = json["LUFTDATEN_ON"];
+  SMOGLIST_ON = json["SMOGLIST_ON"];
 
   AIRMONITOR_ON = json["AIRMONITOR_ON"];
   AIRMONITOR_GRAPH_ON = json["AIRMONITOR_GRAPH_ON"];
@@ -86,6 +87,7 @@ bool loadConfig() {
   _safeCpy(MQTT_PASSWORD, json["MQTT_PASSWORD"], "password");
   
   SENDING_FREQUENCY = json["SENDING_FREQUENCY"];
+  SENDING_DB_FREQUENCY = json["SENDING_DB_FREQUENCY"];
   DEEPSLEEP_ON = json["DEEPSLEEP_ON"];
 
   DEBUG = json["DEBUG"];
@@ -127,6 +129,8 @@ bool loadConfig() {
 	
 	Serial.print("Loaded LUFTDATEN_ON: ");
 	Serial.println(LUFTDATEN_ON);
+	Serial.print("Loaded SMOGLIST_ON: ");
+	Serial.println(SMOGLIST_ON);
 	
     Serial.print("Loaded AIRMONITOR_ON: ");
     Serial.println(AIRMONITOR_ON);
@@ -174,6 +178,8 @@ bool loadConfig() {
     
 	Serial.print("Loaded SENDING_FREQUENCY: ");
     Serial.println(SENDING_FREQUENCY);
+	Serial.print("Loaded SENDING_DB_FREQUENCY: ");
+    Serial.println(SENDING_DB_FREQUENCY);
 	Serial.print("Loaded DEEPSLEEP_ON: ");
     Serial.println(DEEPSLEEP_ON);
 	
@@ -220,6 +226,7 @@ bool saveConfig() {
   json["NUMBEROFMEASUREMENTS"] = NUMBEROFMEASUREMENTS;
 
   json["LUFTDATEN_ON"] = LUFTDATEN_ON;
+  json["SMOGLIST_ON"] = SMOGLIST_ON;
 
   json["AIRMONITOR_ON"] = AIRMONITOR_ON;
   json["AIRMONITOR_GRAPH_ON"] = AIRMONITOR_GRAPH_ON;
@@ -246,6 +253,7 @@ bool saveConfig() {
   json["MQTT_PASSWORD"] = MQTT_PASSWORD;
 
   json["SENDING_FREQUENCY"] = SENDING_FREQUENCY;
+  json["SENDING_DB_FREQUENCY"] = SENDING_DB_FREQUENCY;
   json["DEEPSLEEP_ON"] = DEEPSLEEP_ON;
 
   json["DEBUG"] = DEBUG;
