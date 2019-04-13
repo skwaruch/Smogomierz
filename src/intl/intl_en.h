@@ -29,13 +29,13 @@ char EN_INTL_SELECTEDLANGUAGE[16] PROGMEM = "Language";
 char EN_INTL_TEMPHUMIPRESSSENSOR[64] PROGMEM = "Temp/Humi/Press Sensor";
 char EN_INTL_PMSENSOR[32] PROGMEM = "PM2.5/PM10 Sensor";
 
-char EN_INTL_FREQUENTMEASUREMENTONOFF[32] PROGMEM = "Frequent measurement";
-char EN_INTL_FREQUENTMEASUREMENTINFO[96] PROGMEM = "frequent measurements - every few seconds, shorten the life span of the PM sensor.";
+char EN_INTL_FREQUENTMEASUREMENTONOFF[32] PROGMEM = "Continuous measurements";
+char EN_INTL_FREQUENTMEASUREMENTINFO[96] PROGMEM = "Continuous measurements significantly shorten the life span of the PM sensor.";
 char EN_INTL_MEASUREMENTFREQUENCY[32] PROGMEM = "Make PM measurements every";
 char EN_INTL_AVERAGELASTRESULT[32] PROGMEM = "Average result from last";
 char EN_INTL_PMMEASUREMENTS[32] PROGMEM = "PM measurements";
 char EN_INTL_SENDINGINTERVAL[64] PROGMEM = "Sending data to external services every";
-char EN_INTL_SERVICESSENDINGINTERVAL[64] PROGMEM = "Sending data to AirMonitor/Luftdaten every";
+char EN_INTL_SERVICESSENDINGINTERVAL[64] PROGMEM = "Sending data to AirMonitor/Luftdaten/Smoglist every";
 char EN_INTL_DBSENDINGINTERVAL[64] PROGMEM = "Sending data to ThingSpeak/InfluxDB/MQTT every";
 char EN_INTL_SECONDS[16] PROGMEM = "seconds";
 char EN_INTL_MINUTES[16] PROGMEM = "minutes";
@@ -51,9 +51,10 @@ char EN_INTL_SECUREPASSWD[16] PROGMEM = "Password";
 char EN_INTL_SECURELOGOUTINFO[64] PROGMEM = "Restart your web browser to log out!";
 
 char EN_INTL_LUFTDATENSENDING[96] PROGMEM = "Sending data to the {LUFTDATEN_LINK} service(requires filling out {LUFTDATENFORM_LINK})"; 
-char EN_INTL_SMOGLISTSENDING[64] PROGMEM = "Sending data to the Smoglist service";
+char EN_INTL_SMOGLISTSENDING[64] PROGMEM = "Sending data to the {SMOGLIST_LINK} service";
+char EN_INTL_SMOGLISTINFO[256] = "Smoglist is a service that collects Smogomierz usage statistics(we do not collect logins and passwords). It will allow us to improve the most commonly used functions in the future and generate our own charts.";
 
-char EN_INTL_AIRMONITORSENDING[128] PROGMEM = "Sending data to the {AIRMONITOR_LINK} service(requires filling out {AIRMONITORFORM_LINK}; Sensor: e.g. SDS011/21)";
+char EN_INTL_AIRMONITORSENDING[128] PROGMEM = "Sending data to the {AIRMONITOR_LINK} service(requires filling out {AIRMONITORFORM_LINK}; Sensor: e.g. {PMSENSORMODEL})";
 char EN_INTL_AIRMONITORCHARTS[64] PROGMEM = "Displaying charts from the AirMonitor site";
 char EN_INTL_AIRMONITORCOORDINATESINFO[80] PROGMEM = "Geographical coordinates(you can check it {LATLONG_LINK}";
 char EN_INTL_AIRMONITORLATITUDE[32] PROGMEM = "Latitude";

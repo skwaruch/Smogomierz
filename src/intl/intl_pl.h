@@ -29,13 +29,13 @@ char PL_INTL_SELECTEDLANGUAGE[16] PROGMEM = "Język";
 char PL_INTL_TEMPHUMIPRESSSENSOR[64] PROGMEM = "Miernik Temp/Wilgotności/Ciśnienia";
 char PL_INTL_PMSENSOR[32] PROGMEM = "Miernik PM2.5/PM10";
 
-char PL_INTL_FREQUENTMEASUREMENTONOFF[32] PROGMEM = "Częste pomiary PM";
-char PL_INTL_FREQUENTMEASUREMENTINFO[96] PROGMEM = "Częste pomiary – co kilka-kilkanaście sekund, skracają żywotność miernika PM.";
+char PL_INTL_FREQUENTMEASUREMENTONOFF[32] PROGMEM = "Ciągłe pomiary PM";
+char PL_INTL_FREQUENTMEASUREMENTINFO[96] PROGMEM = "Ciągłe pomiary znacznie skracają żywotność miernika PM.";
 char PL_INTL_MEASUREMENTFREQUENCY[32] PROGMEM = "Wykonywanie pomiarów PM co";
 char PL_INTL_AVERAGELASTRESULT[32] PROGMEM = "Uśredniaj wynik z ostatnich";
 char PL_INTL_PMMEASUREMENTS[32] PROGMEM = "pomiarów PM";
 char PL_INTL_SENDINGINTERVAL[64] PROGMEM = "Wysyłanie danych do serwisów zewnętrznych co";
-char PL_INTL_SERVICESSENDINGINTERVAL[64] PROGMEM = "Wysyłanie danych do AirMonitor/Luftdaten co";
+char PL_INTL_SERVICESSENDINGINTERVAL[64] PROGMEM = "Wysyłanie danych do AirMonitor/Luftdaten/Smoglist co";
 char PL_INTL_DBSENDINGINTERVAL[64] PROGMEM = "Wysyłanie danych do ThingSpeak/InfluxDB/MQTT co";
 char PL_INTL_SECONDS[16] PROGMEM = "sekund";
 char PL_INTL_MINUTES[16] PROGMEM = "minut";
@@ -51,9 +51,10 @@ char PL_INTL_SECUREPASSWD[16] PROGMEM = "Hasło";
 char PL_INTL_SECURELOGOUTINFO[64] PROGMEM = "Zrestartuj przeglądarkę w celu wylogowania!";
 
 char PL_INTL_LUFTDATENSENDING[96] PROGMEM = "Wysyłanie danych do serwisu {LUFTDATEN_LINK} (wymaga wypełnienia {LUFTDATENFORM_LINK})";
-char PL_INTL_SMOGLISTSENDING[64] PROGMEM = "Wysyłanie danych do serwisu Smoglist";
+char PL_INTL_SMOGLISTSENDING[64] PROGMEM = "Wysyłanie danych do serwisu {SMOGLIST_LINK}";
+char PL_INTL_SMOGLISTINFO[256] = "Smoglist to serwis zbierający statystyki użytkowania Smogomierzy(nie zbieramy loginów i haseł). Smoglist pozwoli nam w przyszłości ulepszyć najcześciej używane funkcje i generować własne wykresy.";
 
-char PL_INTL_AIRMONITORSENDING[128] PROGMEM = "Wysyłanie danych do serwisu {AIRMONITOR_LINK} (wymaga wypełnienia {AIRMONITORFORM_LINK}; Sensor: np. SDS011/21)";
+char PL_INTL_AIRMONITORSENDING[128] PROGMEM = "Wysyłanie danych do serwisu {AIRMONITOR_LINK} (wymaga wypełnienia {AIRMONITORFORM_LINK}; Sensor: np. {PMSENSORMODEL})";
 char PL_INTL_AIRMONITORCHARTS[64] PROGMEM = "Wyświetlanie wykresów z serwisu AirMonitor";
 char PL_INTL_AIRMONITORCOORDINATESINFO[80] PROGMEM = "Współrzędne geograficzne miernika(można sprawdzić {LATLONG_LINK}";
 char PL_INTL_AIRMONITORLATITUDE[32] PROGMEM = "Szerokość(latitude)";
