@@ -77,6 +77,8 @@ const char WEB_CONFIG_PAGE_CONFIG[] PROGMEM = "<b>{TEXT_DEVICENAME}: </b>{device
 	<hr>\	
 	<b>{TEXT_LUFTDATENSENDING}: </b>{LUFTDATEN_ON}\
 	<b>ChipID: </b>{ChipID}\
+	<br><b>{THPSENSOR}</b> Sensor PIN: <b>{THPXPIN}</b>\
+	<br><b>{DUSTSENSOR}</b> Sensor PIN: <b>{DUSTXPIN}</b>\
 	<hr>\
 	<b>{TEXT_AIRMONITORSENDING}: </b>{AIRMONITOR_ON}\
 	<b>{TEXT_AIRMONITORCHARTS}: </b>{AIRMONITOR_GRAPH_ON}\
@@ -158,7 +160,10 @@ const char WEB_UPDATE_PAGE_UPDATE[] PROGMEM = "<main role='main' class='containe
 	{TEXT_AUTOUPDATEON}: <b>{AUTOUPDATEONSTATUS}</b>\
 	<br>{TEXT_CURRENTSOFTVERSION}: <b>{SOFTWAREVERSION}</b>\
 	<br>{TEXT_SERVERSOFTWAREVERSION}: <b>{SERVERSOFTWAREVERSION}</b>\
+	<br>{TEXT_LATESTAVAILABLESOFT}\
 	<br>\
-	{TEXT_LATESTAVAILABLESOFT}";
+	<br>{TEXT_CONNECTEDWIFI}: <b>{WiFiSSID}</b>\
+	<br>{TEXT_WIFIRSSI}: <b>{WiFiRSSI}</b>\
+	<br>{TEXT_WIFIQUALITY}: <b>{WiFiQuality}</b>";
 
 // UPDATE PAGE - END
