@@ -40,8 +40,8 @@ uint16_t MQTT_PORT = 1883;
 char MQTT_USER[255] = "username";
 char MQTT_PASSWORD[255] = "password";
 
-int SENDING_FREQUENCY = 2;
-int SENDING_DB_FREQUENCY = 2;
+int SENDING_FREQUENCY = 3;
+int SENDING_DB_FREQUENCY = 3;
 bool DEEPSLEEP_ON = false;
 
 bool DEBUG = false;
@@ -52,5 +52,5 @@ char CONFIG_USERNAME[255] = "admin";
 char CONFIG_PASSWORD[255] = "password";
 
 char MODEL[255] = "white";
-float calib1 = 1.6;
-float calib2 = 0.55;
+float calib1 = 1.0;
+float calib2 = 1.0;

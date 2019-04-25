@@ -50,7 +50,8 @@ char PL_INTL_SECURELOGIN[16] PROGMEM = "Login";
 char PL_INTL_SECUREPASSWD[16] PROGMEM = "Hasło";
 char PL_INTL_SECURELOGOUTINFO[64] PROGMEM = "Zrestartuj przeglądarkę w celu wylogowania!";
 
-char PL_INTL_LUFTDATENSENDING[96] PROGMEM = "Wysyłanie danych do serwisu {LUFTDATEN_LINK} (wymaga wypełnienia {LUFTDATENFORM_LINK})";
+char PL_INTL_LUFTDATENSENDING[96] PROGMEM = "Wysyłanie danych do serwisu {LUFTDATEN_LINK} (wymaga rejestracji {LUFTDATENFORM_LINK})";
+
 char PL_INTL_SMOGLISTSENDING[64] PROGMEM = "Wysyłanie danych do serwisu {SMOGLIST_LINK}";
 char PL_INTL_SMOGLISTINFO[256] = "Smoglist to serwis zbierający statystyki użytkowania Smogomierzy(nie zbieramy loginów i haseł). Smoglist pozwoli nam w przyszłości ulepszyć najcześciej używane funkcje i generować własne wykresy.";
 
@@ -105,9 +106,13 @@ char PL_INTL_UPDATEPAGEAUTOUPDATEWARNING[192] PROGMEM = "Automatyczne aktualizac
 
 char PL_INTL_SELECTUPDATEFILE[32] PROGMEM = "Wybierz plik .bin";
 char PL_INTL_SUBMITUPDATE[16] PROGMEM = "Update!";
-char PL_INTL_CURRENTSOFTVERSION[64] PROGMEM = "Aktualna wersja oprogramowania";
+char PL_INTL_CURRENTSOFTVERSION[64] PROGMEM = "Używana wersja oprogramowania";
 char PL_INTL_SERVERSOFTWAREVERSION[64] PROGMEM = "Najnowsza dostępna wersja oprogramowania";
 char PL_INTL_LATESTAVAILABLESOFT[96] PROGMEM = "Najnowszą wersję oprogramowania znajdziesz zawsze {SMOGOMIERZRELEASES_LINK}.";
 
 char PL_INTL_HERE[16] PROGMEM = "tutaj";
 char PL_INTL_THEFORM[16] PROGMEM = "formularz";
+
+char PL_INTL_CONNECTEDWIFI[32] = "Połączony z WiFi(SSID)";
+char PL_INTL_WIFIRSSI[32] = "Siła sygnału WiFi(RSSI)";
+char PL_INTL_WIFIQUALITY[32] = "Jakość sygnału WiFi";
