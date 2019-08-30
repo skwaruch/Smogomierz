@@ -1,8 +1,12 @@
+#ifdef ARDUINO_ARCH_ESP8266
+
 #ifndef __SDS_DUST_SENSOR_RESULTS_H__
 #define __SDS_DUST_SENSOR_RESULTS_H__
 
 #include "SdsDustSensorCommands.h"
+#ifndef ARDUINO_SAMD_VARIANT_COMPLIANCE // there is no SoftwareSerial available (needed) on SAMD boards.
 #include <SoftwareSerial.h>
+#endif
 
 enum class Status {
   Ok, NotAvailable, InvalidChecksum, InvalidResponseId, InvalidHead, InvalidTail
@@ -148,3 +152,7 @@ struct FirmwareVersionResult: public Result {
 
 
 #endif // __SDS_DUST_SENSOR_RESULTS_H__
+
+#elif defined ARDUINO_ARCH_ESP32
+
+#endif
