@@ -1,8 +1,10 @@
 #include <ArduinoJson.h>
 #include <FS.h>
+#ifdef ARDUINO_ARCH_ESP32
+#include <SPIFFS.h>
+#endif
 
 #include "config.h"
-
 
 void _safeCpy(char* dest, const JsonVariant &obj, const char* dflt = "") {
   const char* val = obj.as<const char*>();
@@ -195,10 +197,11 @@ bool loadConfig() {
 	
     Serial.print("Loaded MODEL: ");
     Serial.println(MODEL);
-
+	
     Serial.print("Loaded SOFTWAREVERSION: ");
     Serial.println(SOFTWAREVERSION);
-    Serial.println("\n");
+    
+	Serial.println("\n");
   }
   return true;
 }
@@ -225,7 +228,7 @@ bool saveConfig() {
   json["AIRMONITOR_ON"] = AIRMONITOR_ON;
   json["AIRMONITOR_GRAPH_ON"] = AIRMONITOR_GRAPH_ON;
   json["LATITUDE"] = LATITUDE;
-  json["LONGITUDE"] = LONGITUDE;
+ json["LONGITUDE"] = LONGITUDE;
   json["MYALTITUDE"] = MYALTITUDE;
 
   json["THINGSPEAK_ON"] = THINGSPEAK_ON;
@@ -239,12 +242,14 @@ bool saveConfig() {
   json["INFLUXDB_DATABASE"] = INFLUXDB_DATABASE;
   json["DB_USER"] = DB_USER;
   json["DB_PASSWORD"] = DB_PASSWORD;
+  json["DB_PASSWORD"] = String(DB_PASSWORD);
   
   json["MQTT_ON"] = MQTT_ON;
   json["MQTT_HOST"] = MQTT_HOST;
   json["MQTT_PORT"] = MQTT_PORT;
   json["MQTT_USER"] = MQTT_USER;
   json["MQTT_PASSWORD"] = MQTT_PASSWORD;
+  json["MQTT_PASSWORD"] = String(MQTT_PASSWORD);
 
   json["SENDING_FREQUENCY"] = SENDING_FREQUENCY;
   json["SENDING_DB_FREQUENCY"] = SENDING_DB_FREQUENCY;
@@ -257,6 +262,7 @@ bool saveConfig() {
   json["CONFIG_AUTH"] = CONFIG_AUTH;
   json["CONFIG_USERNAME"] = CONFIG_USERNAME;
   json["CONFIG_PASSWORD"] = CONFIG_PASSWORD;
+  json["CONFIG_PASSWORD"] = String(CONFIG_PASSWORD);
   
   json["MODEL"] = MODEL;
   
