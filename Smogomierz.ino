@@ -3,7 +3,7 @@
 #include <ESP8266mDNS.h>
 #include <ESP8266HTTPUpdateServer.h>
 #include <SoftwareSerial.h>
-#elif defined ARDUINO_ARCH_ESP32 // Arduino core for the ESP32 - 1.0.3-rc2 or later
+#elif defined ARDUINO_ARCH_ESP32 // Arduino core for the ESP32 - 1.0.4-rc1 or later // at 1.0.3 autoupdate doesn't work !!!
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <ESPmDNS.h>
@@ -30,19 +30,20 @@
 /*
   ESP8266 - NodeMCU 1.0 - 1M SPIFFS
 
-  Szkic używa 528788 bajtów (50%) pamięci programu. Maksimum to 1044464 bajtów.
-  Zmienne globalne używają 53504 bajtów (65%) pamięci dynamicznej, pozostawiając 28416 bajtów dla zmiennych lokalnych. Maksimum to 81920 bajtów.
-
   Szkic używa 529960 bajtów (50%) pamięci programu. Maksimum to 1044464 bajtów.
   Zmienne globalne używają 54060 bajtów (65%) pamięci dynamicznej, pozostawiając 27860 bajtów dla zmiennych lokalnych. Maksimum to 81920 bajtów.
 
-  ESP32 Dev Module - 1.9MB APP with OTA - 190KB SPIFFS
+  Szkic używa 530224 bajtów (50%) pamięci programu. Maksimum to 1044464 bajtów.
+  Zmienne globalne używają 54580 bajtów (66%) pamięci dynamicznej, pozostawiając 27340 bajtów dla zmiennych lokalnych. Maksimum to 81920 bajtów.
 
-  Szkic używa 1246110 bajtów (63%) pamięci programu. Maksimum to 1966080 bajtów.
-  Zmienne globalne używają 61060 bajtów (18%) pamięci dynamicznej, pozostawiając 266620 bajtów dla zmiennych lokalnych. Maksimum to 327680 bajtów.
+  ESP32 Dev Module - 1.9MB APP with OTA - 190KB SPIFFS
 
   Szkic używa 1247218 bajtów (63%) pamięci programu. Maksimum to 1966080 bajtów.
   Zmienne globalne używają 62148 bajtów (18%) pamięci dynamicznej, pozostawiając 265532 bajtów dla zmiennych lokalnych. Maksimum to 327680 bajtów.
+
+  Szkic używa 1251282 bajtów (63%) pamięci programu. Maksimum to 1966080 bajtów.
+  Zmienne globalne używają 62744 bajtów (19%) pamięci dynamicznej, pozostawiając 264936 bajtów dla zmiennych lokalnych. Maksimum to 327680 bajtów.
+
 */
 
 #include <PubSubClient.h>
@@ -411,6 +412,7 @@ void setup() {
   if (wifiManager.autoConnect(device_name)) {
     Serial.println("connected...yeey :)");
     //wifiManager.setConfigPortalBlocking(false);
+    WiFi.mode(WIFI_STA); // https://github.com/hackerspace-silesia/Smogomierz/issues/47#issue-496810438
   } else {
     Serial.println("Configportal running");
     wifiManager.setConfigPortalBlocking(false);
