@@ -17,6 +17,7 @@ char PL_INTL_TEMPERATURE[16] PROGMEM = "Temperatura";
 char PL_INTL_HUMIDITY[16] PROGMEM = "Wilgotność";
 char PL_INTL_PRESSURE[16] PROGMEM = "Ciśnienie";
 char PL_INTL_DEWPOINT[16] PROGMEM = "Punkt rosy";
+char PL_INTL_VOLTAGE[16] PROGMEM = "Napięcie zas";
 
 char PL_INTL_AIRPOLLUTION[32] PROGMEM = "Pomiary zanieczyszczeń";
 char PL_INTL_SAVED[16] PROGMEM = "ZAPISANO";

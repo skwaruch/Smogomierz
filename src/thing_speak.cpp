@@ -8,7 +8,7 @@
 #include "ThingSpeak.h"
 #include "config.h"
 
-void sendDataToThingSpeak(float currentTemperature, float currentPressure, float currentHumidity, int averagePM1, int averagePM25, int averagePM4, int averagePM10) {
+void sendDataToThingSpeak(float currentTemperature, float currentPressure, float currentHumidity, int averagePM1, int averagePM25, int averagePM4, int averagePM10, float dewPoint, float averageVcc) {
     if (!(THINGSPEAK_ON)) {
         return;
     }
@@ -22,9 +22,11 @@ void sendDataToThingSpeak(float currentTemperature, float currentPressure, float
 	}
 	if (strcmp(THP_MODEL, "Non")) {
 	    ThingSpeak.setField(4, currentTemperature);
-	    ThingSpeak.setField(5, currentPressure);
-	    ThingSpeak.setField(6, currentHumidity);
+	    ThingSpeak.setField(5, currentHumidity);
+		ThingSpeak.setField(6, dewPoint);
+		ThingSpeak.setField(7, currentPressure);
 	}
+	ThingSpeak.setField(8, averageVcc);
     ThingSpeak.writeFields(THINGSPEAK_CHANNEL_ID, THINGSPEAK_API_KEY);
     client.stop();
 }

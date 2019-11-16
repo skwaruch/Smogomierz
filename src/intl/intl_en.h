@@ -17,6 +17,7 @@ char EN_INTL_TEMPERATURE[16] PROGMEM = "Temperature";
 char EN_INTL_HUMIDITY[16] PROGMEM = "Humidity";
 char EN_INTL_PRESSURE[16] PROGMEM = "Pressure";
 char EN_INTL_DEWPOINT[16] PROGMEM = "Dewpoint";
+char EN_INTL_VOLTAGE[16] PROGMEM = "Supply voltage";
 
 char EN_INTL_AIRPOLLUTION[32] PROGMEM = "Air pollution";
 char EN_INTL_SAVED[16] PROGMEM = "SAVED!";

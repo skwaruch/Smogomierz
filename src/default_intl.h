@@ -17,6 +17,7 @@ extern char TEXT_TEMPERATURE[16] = "Temperature";
 extern char TEXT_HUMIDITY[16] = "Humidity";
 extern char TEXT_PRESSURE[16] = "Pressure";
 extern char TEXT_DEWPOINT[16] = "Dewpoint";
+extern char TEXT_VOLTAGE[16] = "Supply voltage";
 
 extern char TEXT_AIRPOLLUTION[32] = "Air pollution";
 extern char TEXT_SAVED[16] = "SAVED!";

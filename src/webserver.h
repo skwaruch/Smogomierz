@@ -38,6 +38,8 @@ void handle_root() {
   } else {
     message.replace("{WEB_UPDATE_INFO_WARNING}", "");
   }
+	message.replace("{TEXT_VOLTAGE}", (TEXT_VOLTAGE));
+	message.replace("{Voltage}", String(averageVcc));
 
   if (!strcmp(THP_MODEL, "Non")) {
     message.replace("{TEXT_WEATHER}:", "");
@@ -59,12 +61,14 @@ void handle_root() {
       message.replace("{Temperature}", String(currentTemperature));
       message.replace("{Pressure}", String(currentPressure));
       message.replace("{Humidity}", String(currentHumidity));
-      message.replace("{Dewpoint}", String(float(pow((currentHumidity) / 100, 0.125) * (112 + 0.9 * (currentTemperature)) + 0.1 * (currentTemperature) - 112)));
+      message.replace("{Dewpoint}", String(dewPoint));
     } else {
       message.replace("{TEXT_TEMPERATURE}: {Temperature} °C", "");
       message.replace("{TEXT_HUMIDITY}: {Humidity} %", "");
       message.replace("{TEXT_PRESSURE}: {Pressure} hPa", "");
       message.replace("{TEXT_DEWPOINT}: {Dewpoint} °C", "");
+	  message.replace("{TEXT_VOLTAGE}", (TEXT_VOLTAGE));
+	  message.replace("{Voltage}", String(averageVcc));
     }
   } else if (!strcmp(THP_MODEL, "HTU21")) {
     if (checkHTU21DStatus()) {
@@ -75,7 +79,7 @@ void handle_root() {
       message.replace("{Temperature}", String(currentTemperature));
       message.replace("{TEXT_PRESSURE}: {Pressure} hPa", "");
       message.replace("{Humidity}", String(currentHumidity));
-      message.replace("{Dewpoint}", String(float(pow((currentHumidity) / 100, 0.125) * (112 + 0.9 * (currentTemperature)) + 0.1 * (currentTemperature) - 112)));
+      message.replace("{Dewpoint}", String(dewPoint));
     } else {
       message.replace("{TEXT_TEMPERATURE}: {Temperature} °C", "");
       message.replace("{TEXT_HUMIDITY}: {Humidity} %", "");
@@ -91,7 +95,7 @@ void handle_root() {
       message.replace("{Temperature}", String(currentTemperature));
       message.replace("{TEXT_PRESSURE}: {Pressure} hPa", "");
       message.replace("{Humidity}", String(currentHumidity));
-      message.replace("{Dewpoint}", String(float(pow((currentHumidity) / 100, 0.125) * (112 + 0.9 * (currentTemperature)) + 0.1 * (currentTemperature) - 112)));
+      message.replace("{Dewpoint}", String(dewPoint));
     } else {
       message.replace("{TEXT_TEMPERATURE}: {Temperature} °C", "");
       message.replace("{TEXT_HUMIDITY}: {Humidity} %", "");
@@ -107,22 +111,6 @@ void handle_root() {
       message.replace("{Pressure}", String(currentPressure));
       message.replace("{TEXT_HUMIDITY}: {Humidity} %", "");
       message.replace("{TEXT_DEWPOINT}: {Pressure} °C", "");
-    } else {
-      message.replace("{TEXT_TEMPERATURE}: {Temperature} °C", "");
-      message.replace("{TEXT_HUMIDITY}: {Humidity} %", "");
-      message.replace("{TEXT_PRESSURE}: {Pressure} hPa", "");
-      message.replace("{TEXT_DEWPOINT}: {Dewpoint} °C", "");
-    }
-  } else if (!strcmp(THP_MODEL, "SHT1x")) {
-    if (checkSHT1xStatus()) {
-      message.replace("{TEXT_TEMPERATURE}", (TEXT_TEMPERATURE));
-      message.replace("{TEXT_HUMIDITY}", (TEXT_HUMIDITY));
-      message.replace("{TEXT_DEWPOINT}", (TEXT_DEWPOINT));
-
-      message.replace("{Temperature}", String(currentTemperature));
-      message.replace("{TEXT_PRESSURE}: {Pressure} hPa", "");
-      message.replace("{Humidity}", String(float(currentHumidity)));
-      message.replace("{Dewpoint}", String(float(pow((currentHumidity) / 100, 0.125) * (112 + 0.9 * (currentTemperature)) + 0.1 * (currentTemperature) - 112)));
     } else {
       message.replace("{TEXT_TEMPERATURE}: {Temperature} °C", "");
       message.replace("{TEXT_HUMIDITY}: {Humidity} %", "");
@@ -227,9 +215,6 @@ String _addModelSelect(const String &key, const String &value) {
   if (!strcmp(THP_MODEL, "DHT22")) {
     input += _addOption("white", (TEXT_AUTOMATICCALIBRATION), value);
   }
-  if (!strcmp(THP_MODEL, "SHT1x")) {
-    input += _addOption("white", (TEXT_AUTOMATICCALIBRATION), value);
-  }
   input += FPSTR(WEB_CONFIG_PAGE_SELECTEND);
   return input;
 }
@@ -243,7 +228,6 @@ String _addTHP_MODELSelect(const String &key, const String &value) {
       input += _addOption("BME280-SparkFun", "BME280-SparkFun", value);
     }
   }
-  input += _addOption("SHT1x", "SHT1x", value);
   input += _addOption("HTU21", "SHT21/HTU21D", value);
   input += _addOption("DHT22", "DHT22", value);
   input += _addOption("BMP280", "BMP280", value);
@@ -485,9 +469,6 @@ void _handle_config(bool is_success) {
   } else if (!strcmp(THP_MODEL, "DHT22")) {
     message.replace("{THPSENSOR}", "DHT22");
     message.replace("{THPXPIN}", "7");
-  } else if (!strcmp(THP_MODEL, "SHT1x")) {
-    message.replace("{THPSENSOR}", "SHT1x");
-    message.replace("{THPXPIN}", "12");
   } else {
     message.replace("<br><b>{THPSENSOR}</b> Sensor PIN: <b>{THPXPIN}</b>", "");
   }
@@ -935,7 +916,7 @@ void handle_api() {
       json["temperature"] = float(currentTemperature);
       json["pressure"] = int(currentPressure);
       json["humidity"] = int(currentHumidity);
-      json["dewpoint"] = float(pow((currentHumidity) / 100, 0.125) * (112 + 0.9 * (currentTemperature)) + 0.1 * (currentTemperature) - 112);
+      json["dewpoint"] = float(dewPoint);
     }
   }
   if (!strcmp(THP_MODEL, "BMP280")) {
@@ -948,21 +929,14 @@ void handle_api() {
     if (checkHTU21DStatus()) {
       json["temperature"] = float(currentTemperature);
       json["humidity"] = int(currentHumidity);
-      json["dewpoint"] = float(pow((currentHumidity) / 100, 0.125) * (112 + 0.9 * (currentTemperature)) + 0.1 * (currentTemperature) - 112);
+      json["dewpoint"] = float(dewPoint);
     }
   }
   if (!strcmp(THP_MODEL, "DHT22")) {
     if (checkDHT22Status()) {
       json["temperature"] = float(currentTemperature);
       json["humidity"] = int(currentHumidity);
-      json["dewpoint"] = float(pow((currentHumidity) / 100, 0.125) * (112 + 0.9 * (currentTemperature)) + 0.1 * (currentTemperature) - 112);
-    }
-  }
-  if (!strcmp(THP_MODEL, "SHT1x")) {
-    if (checkSHT1xStatus()) {
-      json["temperature"] = float(currentTemperature);
-      json["humidity"] = int(currentHumidity);
-      json["dewpoint"] = float(pow((currentHumidity) / 100, 0.125) * (112 + 0.9 * (currentTemperature)) + 0.1 * (currentTemperature) - 112);
+      json["dewpoint"] = float(dewPoint);
     }
   }
 

@@ -25,7 +25,8 @@ const char WEB_ROOT_PAGE_MEASUREMENTS[] PROGMEM = "<main role='main' class='cont
 	<h3>{TEXT_TEMPERATURE}: {Temperature} °C</h3>\
 	<h3>{TEXT_HUMIDITY}: {Humidity} %</h3>\
 	<h3>{TEXT_PRESSURE}: {Pressure} hPa</h3>\
-	<h3>{TEXT_DEWPOINT}: {Dewpoint} °C</h3><p>\
+	<h3>{TEXT_DEWPOINT}: {Dewpoint} °C</h3>\
+	<h3>{TEXT_VOLTAGE}: {Voltage} V</h3><p>\
 	<h2>{TEXT_AIRPOLLUTION}:</h2>\
 	<h3>PM1: {averagePM1} µg/m³</h3>\
 	<h3>PM2.5: {colorAveragePM25} {averagePM25} µg/m³</h3>\

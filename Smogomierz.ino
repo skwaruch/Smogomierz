@@ -59,7 +59,6 @@
 #endif
 #include "src/HTU21D.h" // https://github.com/enjoyneering/HTU21D // 12.03.2019
 #include "src/Adafruit_BMP280.h" // https://github.com/adafruit/Adafruit_BMP280_Library // 12.03.2019
-#include "src/SHT1x.h" // https://github.com/practicalarduino/SHT1x // 12.03.2019
 #include <DHT.h>
 
 #include "src/pms.h" // https://github.com/fu-hsi/PMS // 12.03.2019
@@ -78,18 +77,17 @@
 /*
   Podłączenie czujnikow dla ESP8266 NodeMCU:
   BME280/BMP280: VIN - 3V; GND - G; SCL - D4; SDA - D3
-  SHT1x: VIN - 3V; GND - G; SCL - D5; DATA/SDA - D6 wymaga rezystora 10k podłaczonego do VCC
-  SHT21/HTU21D: VIN - 3V; GND - G; SCL - D5; SDA - D6
   DHT22: VIN - 3V; GND - G; D7
   PMS5003/7003: Bialy - VIN/5V; Czarny - G; Zielony/TX - D1; Niebieski/RX - D2
 
 
   Connection of sensors on ESP8266 NodeMCU:
   BME280/BMP280: VIN - 3V; GND - G; SCL - D4; SDA - D3
-  SHT1x: VIN - 3V; GND - G; SCL - D5; DATA/SDA - D6 required pull-up resistor 10k to VCC
-  SHT21/HTU21D: VIN - 3V; GND - G; SCL - D5; SDA - D6
   DHT22: VIN - 3V; GND - G; D7
   PMS5003/7003: White - VIN/5V; Black - G; Green/TX - D1; Blue/RX - D2
+  
+  Przełącznik - D5
+  Switch - D5
 */
 
 // TEMP/HUMI/PRESS Sensor config - START
@@ -116,9 +114,9 @@ HTU21D  myHTU21D(HTU21D_RES_RH12_TEMP14);
 DHT dht(DHTPIN, DHTTYPE);
 
 // SHT1x – Config
-#define dataPin 14 //D5
-#define clockPin 12 //D6
-SHT1x sht1x(dataPin, clockPin);
+//#define dataPin 14 //D5
+//#define clockPin 12 //D6
+//SHT1x sht1x(dataPin, clockPin);
 // TEMP/HUMI/PRESS Sensor config - END
 
 // DUST Sensor config - START
@@ -151,10 +149,24 @@ unsigned long TwoSec_interval = 2 * 1000; // 2 second
 unsigned long REBOOT_interval = 24 * 60 * 60 * 1000; // 24 hours
 unsigned long previous_REBOOT_Millis = 0;
 
+unsigned long Vcc_interval = 1000; // 1 second
+unsigned long previous_Vcc_Millis = 0;
+
+//Szymon
+#define SWITCH_PIN 14	//D5  LOW - DEEP_SLEEP
+#define PMS_SLEEP_PIN 12	//D6  LOW - PMS off
+
+// read supply voltage VCC
+#define iVcc_MAX 10
+ADC_MODE(ADC_VCC);
+float averageVcc = 0;
+float Vcc[iVcc_MAX];
+
 int pmMeasurements[10][3];
-int iPM, averagePM1, averagePM25, averagePM4, averagePM10 = 0;
+int iVcc, iPM, averagePM1, averagePM25, averagePM4, averagePM10 = 0;
 float currentTemperature, currentHumidity, currentPressure = 0;
 float calib = 1;
+float dewPoint = 0;
 
 bool need_update = false;
 char SERVERSOFTWAREVERSION[255] = "";
@@ -232,18 +244,6 @@ bool checkDHT22Status() {
   }
 }
 
-bool checkSHT1xStatus() {
-  int humidity_SHT1x_Int = sht1x.readHumidity();
-  int temperature_SHT1x_Int = sht1x.readTemperatureC();
-  if (humidity_SHT1x_Int == 0 && temperature_SHT1x_Int == 0) {
-    if (DEBUG) {
-      Serial.println("No data from SHT1x sensor!\n");
-    }
-    return false;
-  } else {
-    return true;
-  }
-}
 // check TEMP/HUMI/PRESS Sensor - END
 
 void minutesToSeconds() {
@@ -279,6 +279,9 @@ void MQTTreconnect() {
 #include "src/webserver.h"
 
 void setup() {
+
+  pinMode(PMS_SLEEP_PIN, OUTPUT);
+  digitalWrite(PMS_SLEEP_PIN, HIGH);
   Serial.begin(115200);
   delay(10);
 
@@ -296,13 +299,15 @@ void setup() {
     PMS_Serial.begin(9600, SERIAL_8N1, 5, 4); //PMSx003 serial
 #endif
     if (FREQUENTMEASUREMENT == true) {
-      pms.wakeUp();
+      digitalWrite(PMS_SLEEP_PIN, HIGH);
+	  pms.wakeUp();
       delay(500);
       pms.activeMode();
     } else {
       pms.passiveMode();
-      delay(500);
-      pms.sleep();
+	  delay(500);
+	  digitalWrite(PMS_SLEEP_PIN, LOW);
+	  pms.sleep();
     }
   }
   delay(10);
@@ -358,8 +363,7 @@ void setup() {
     myHTU21D.begin();
   } else if (!strcmp(THP_MODEL, "DHT22")) {
     dht.begin();
-  } else if (!strcmp(THP_MODEL, "SHT1x")) {
-  }
+  } 
   delay(10);
   // TEMP/HUMI/PRESS Sensor setup - END
 
@@ -485,6 +489,12 @@ void loop() {
   delay(10);
 
   pm_calibration();
+//  averageVcc  = (float)ESP.getVcc();
+  Vcc[iVcc] = (float)ESP.getVcc();
+  averageVccf();
+  if (++iVcc == iVcc_MAX) {
+    iVcc = 0;
+  }
 
   // DUST SENSOR refresh data - START
   if (!strcmp(DUST_MODEL, "PMS7003")) {
@@ -608,7 +618,6 @@ void loop() {
 #endif
     delay(5000);
   }
-
 } // loop() - END
 
 void sendDataToExternalServices() {
@@ -647,7 +656,8 @@ void sendDataToExternalDBs() {
   }
 
   if (THINGSPEAK_ON) {
-    sendDataToThingSpeak(currentTemperature, currentPressure, currentHumidity, averagePM1, averagePM25, averagePM4, averagePM10);
+    sendDataToThingSpeak(currentTemperature, currentPressure, currentHumidity,
+	averagePM1, averagePM25, averagePM4, averagePM10, dewPoint, averageVcc);
     if (DEBUG) {
       Serial.println("Sending measurement data to the Thingspeak service!\n");
     }
@@ -705,17 +715,7 @@ void sendDataToExternalDBs() {
             Serial.println("No measurements from DHT22!\n");
           }
         }
-      } else if (!strcmp(THP_MODEL, "SHT1x")) {
-        if (checkSHT1xStatus() == true) {
-          row.addField("temperature", (currentTemperature));
-          row.addField("humidity", (currentHumidity));
-        } else {
-          if (DEBUG) {
-            Serial.println("No measurements from SHT1x!\n");
-          }
-        }
-      }
-
+      } 
       if (influxdb.write(row) == DB_SUCCESS) {
         if (DEBUG) {
           Serial.println("Data sent to InfluxDB\n");
@@ -807,17 +807,6 @@ void sendDataToExternalDBs() {
       }
     }
 
-    if (!strcmp(THP_MODEL, "SHT1x")) {
-      if (checkDHT22Status() == true) {
-        mqttclient.publish(String("Smogomierz-" + mqttChipId + "/sensor/temperature").c_str(), String(currentTemperature).c_str(), true);
-        mqttclient.publish(String("Smogomierz-" + mqttChipId + "/sensor/humidity").c_str(), String(currentHumidity).c_str(), true);
-      } else {
-        if (DEBUG) {
-          Serial.println("No measurements from SHT1x!\n");
-        }
-      }
-    }
-
     if (DEEPSLEEP_ON == true) {
       mqttclient.disconnect();
     }
@@ -886,20 +875,8 @@ void takeTHPMeasurements() {
         Serial.println("No measurements from DHT22!\n");
       }
     }
-  } else if (!strcmp(THP_MODEL, "SHT1x")) {
-    if (checkSHT1xStatus() == true) {
-      if (DEBUG) {
-        Serial.println("Measurements from SHT1x!\n");
-      }
-      currentTemperature = sht1x.readTemperatureC();
-      currentHumidity = sht1x.readHumidity();
-    } else {
-      if (DEBUG) {
-        Serial.println("No measurements from SHT1x!\n");
-      }
-    }
   }
-
+  dewPoint = pow(currentHumidity/100, 0.125)*(112+0.9*currentTemperature)+0.1*currentTemperature-112;
 }
 
 void takeNormalnPMMeasurements() {
@@ -928,7 +905,8 @@ void takeSleepPMMeasurements() {
   }
 
   if (!strcmp(DUST_MODEL, "PMS7003")) {
-    pms.wakeUp();
+	digitalWrite(PMS_SLEEP_PIN, HIGH);
+	pms.wakeUp();
     unsigned long current_2sec_Millis = millis();
     previous_2sec_Millis = millis();
     while (previous_2sec_Millis - current_2sec_Millis <= TwoSec_interval * 5) {
@@ -959,7 +937,8 @@ void takeSleepPMMeasurements() {
   }
 
   if (!strcmp(DUST_MODEL, "PMS7003")) {
-    pms.sleep();
+	digitalWrite(PMS_SLEEP_PIN, LOW);
+	pms.sleep();
   }
 }
 
@@ -1003,15 +982,7 @@ void pm_calibration() {
         calib = calib1;
       }
 
-    } else if (!strcmp(THP_MODEL, "SHT1x")) {
-      if (int(sht1x.readTemperatureC()) < 5 or int(sht1x.readHumidity()) > 60) {
-        calib1 = float((200 - (sht1x.readHumidity())) / 150);
-        calib2 = calib1 / 2;
-        calib = calib2;
-      } else {
-        calib = calib1;
-      }
-    }
+    } 
   }
   // Automatic calibration - END
 
@@ -1020,8 +991,6 @@ void pm_calibration() {
   } else if (!strcmp(THP_MODEL, "HTU21")) {
     calib = calib1;
   } else if (!strcmp(THP_MODEL, "DHT22")) {
-    calib = calib1;
-  } else if (!strcmp(THP_MODEL, "SHT1x")) {
     calib = calib1;
   } else if (!strcmp(THP_MODEL, "BMP280")) {
     calib = calib1;
@@ -1048,5 +1017,23 @@ void averagePM() {
     Serial.print(averagePM25);
     Serial.print("\nAverage PM10: ");
     Serial.print(averagePM10);
+  }
+}
+
+int averageVccf() {
+  for (int i=0; i < iVcc_MAX; i++){
+    averageVcc += Vcc[i];
+  }
+  averageVcc = averageVcc/iVcc_MAX/1000;
+}
+
+// battery protection
+int batteryProtection(){
+  if (averageVcc < 2.4){
+	digitalWrite(PMS_SLEEP_PIN, LOW);
+    pms.sleep();
+    delay(10);
+    ESP.deepSleep(4294967295);  // about 70 min
+    delay(10);
   }
 }
